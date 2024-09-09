@@ -17,33 +17,233 @@ import Styles from "../../assets/css/home.module.css";
 import Logo from "../../assets/images/Logo-icon.png";
 import Flag from "../../assets/images/numberFlag.png";
 import Banner from "../../assets/images/Deliveryboy-Signup-Banner.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Select from "react-select";
 import localforage from "localforage";
+import { validateDeliveryboyForm } from "../../utils/Validation";
+import {
+  getCityList,
+  getCountryList,
+  getStateList,
+  signUpUser,
+} from "../../data_manager/dataManage";
 const DeliveryboySignup = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const checkboxTypes = ["checkbox"];
-
+  const [errors, setErrors] = useState({});
+  const [masterCountryList, setMasterCountryList] = useState(null);
+  const [masterStateList, setMasterStateList] = useState(null);
+  const [masterCityList, setMasterCityList] = useState(null);
+  const [ermessage, setErmessage] = useState("");
+  const [hitButton, setHitButton] = useState(false);
+  const [failedError, setFailedError] = useState(false);
+  const [countryList, setCountryList] = useState([]);
+  const [stateList, setStateList] = useState([]);
+  const [cityList, setCityList] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    code: "+33",
+    number: "",
+    country: "",
+    state: "",
+    city: "",
+    dropdownCountryValue: "",
+    dropdownStateValue: "",
+    dropdownCityValue: "",
+    siret: "",
+    termone: "",
+  });
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  useEffect(() => {
-    const retrieveData = async () => {
-      try {
-        const value = await localforage.getItem("roleName");
-        //   setSelectedOption(value);
-        console.log("Data retrieved successfully:", value);
-      } catch (error) {
-        console.error("Error retrieving data:", error);
-      }
-    };
+  const submitHandler = (e) => {
+    e.preventDefault();
+    const validationErrors = validateDeliveryboyForm(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
-    retrieveData();
+    // console.log(formData);
+    let params = {
+      info: {
+        userName: formData.email,
+        email: formData.email,
+        phoneNumber: formData.code + formData.number,
+        password: formData.password,
+        userrole: "DELIVERY_BOY",
+        firstName: formData.name,
+        lastName: formData.lastName,
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        siretNo: formData.siret,
+        termone: formData.termone,
+      },
+    };
+   
+    setHitButton(true);
+    signUpUser(
+      params,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response) {
+            if (successResponse[0]._response.name == "NotAuthorizedException") {
+              setErmessage(successResponse[0]._response.name);
+              setFailedError(true);
+              setHitButton(false);
+            } else if (successResponse[0]._httpsStatusCode == 200) {
+              navigate("/signup-verify", {
+                state: {
+                  user: {
+                    email: formData.email,
+                    phoneNumber: formData.number,
+                    password: formData.password,
+                  },
+                },
+              });
+            }
+          }
+        }
+      },
+      (errorResponse) => {
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
+        }
+        setErmessage(err);
+        setFailedError(true);
+        setHitButton(false);
+      }
+    );
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setErrors({ ...errors, [name]: "" });
+    if (name === "termone") {
+      const term = e.target.checked ? 1 : 0;
+      setFormData({ ...formData, [name]: term });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+  //get country value and set state
+  const handleCountryChange = (selectedCountry) => {
+    setFormData({
+      ...formData,
+      ["dropdownCountryValue"]: selectedCountry,
+      ["country"]: selectedCountry.value,
+      ["state"]: "",
+      ["city"]: "",
+      ["dropdownCityValue"]: "",
+      ["dropdownStateValue"]: "",
+    });
+    const filteredStates = masterStateList
+      .filter((state) => state.country_id === selectedCountry.value)
+      .map((state) => ({ label: state.state_name, value: state.id }));
+    setStateList(filteredStates);
+    setErrors({ ...errors, ["dropdownCountryValue"]: "" });
+  };
+  const handleStateChange = (selectedState) => {
+    setErrors({ ...errors, ["dropdownStateValue"]: "" });
+    setFormData({
+      ...formData,
+      ["dropdownStateValue"]: selectedState,
+      ["state"]: selectedState.value,
+      ["city"]: "",
+      ["dropdownCityValue"]: "",
+    });
+    const filteredCities = masterCityList
+      .filter((city) => city.state_id === selectedState.value)
+      .map((city) => ({ label: city.city_name, value: city.id }));
+    setCityList(filteredCities);
+  };
+  const handleCityChange = (selectedCity) => {
+    setErrors({ ...errors, ["dropdownCityValue"]: "" });
+    setFormData({
+      ...formData,
+      ["dropdownCityValue"]: selectedCity,
+      ["city"]: selectedCity.value,
+    });
+  };
+  useEffect(() => {
+    let param = {};
+    getCountryList(
+      param,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response) {
+            if (successResponse[0]._response.name == "NotAuthorizedException") {
+              setErmessage(successResponse[0]._response.name);
+            } else {
+              setMasterCountryList(successResponse[0]._response);
+              var formattedCountryList = [];
+              successResponse[0]._response.forEach((element) => {
+                formattedCountryList.push({
+                  label: element.country_name,
+                  value: element.id,
+                });
+              });
+              setCountryList(formattedCountryList);
+            }
+          }
+        }
+      },
+      (errorResponse) => {
+        console.log("errorResponse", errorResponse[0]._errors.message);
+        setErmessage(errorResponse[0]._errors.message);
+      }
+    );
+
+    getStateList(
+      (param = {}),
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response) {
+            if (successResponse[0]._response.name == "NotAuthorizedException") {
+              setErmessage(successResponse[0]._response.name);
+            } else {
+              setMasterStateList(successResponse[0]._response);
+            }
+          }
+        }
+      },
+      (errorResponse) => {
+        console.log("errorResponse", errorResponse[0]._errors.message);
+        setErmessage(errorResponse[0]._errors.message);
+      }
+    );
+
+    getCityList(
+      null,
+      (successResponse) => {
+        if (successResponse[0]._success) {
+          if (successResponse[0]._response) {
+            if (successResponse[0]._response.name == "NotAuthorizedException") {
+              setErmessage(successResponse[0]._response.name);
+            } else {
+              setMasterCityList(successResponse[0]._response);
+            }
+          }
+        }
+      },
+      (errorResponse) => {
+        console.log("errorResponse", errorResponse[0]._errors.message);
+        setErmessage(errorResponse[0]._errors.message);
+      }
+    );
   }, []);
 
   return (
@@ -84,9 +284,20 @@ const DeliveryboySignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="First Name"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleInputChange}
                             />
                           </div>
                         </Form.Group>
+                        {errors.name && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.name}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -100,6 +311,9 @@ const DeliveryboySignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Last Name"
+                              name="lastName"
+                              value={formData.lastName}
+                              onChange={handleInputChange}
                             />
                           </div>
                         </Form.Group>
@@ -116,9 +330,20 @@ const DeliveryboySignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleInputChange}
                             />
                           </div>
                         </Form.Group>
+                        {errors.email && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.email}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -132,6 +357,9 @@ const DeliveryboySignup = () => {
                               className={`password-field ${Styles.signupUserName}`}
                               type={showPassword ? "text" : "password"}
                               placeholder="Password"
+                              name="password"
+                              value={formData.password}
+                              onChange={handleInputChange}
                             />
                             <FontAwesomeIcon
                               icon={showPassword ? faEye : faEyeSlash}
@@ -140,6 +368,14 @@ const DeliveryboySignup = () => {
                             />
                           </div>
                         </Form.Group>
+                        {errors.password && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.password}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -153,6 +389,9 @@ const DeliveryboySignup = () => {
                               className={`password-field ${Styles.signupUserName}`}
                               type={showConfirmPassword ? "text" : "password"}
                               placeholder="Confirm password"
+                              name="confirmPassword"
+                              value={formData.confirmPassword}
+                              onChange={handleInputChange}
                             />
                             <FontAwesomeIcon
                               icon={showConfirmPassword ? faEye : faEyeSlash}
@@ -161,6 +400,14 @@ const DeliveryboySignup = () => {
                             />
                           </div>
                         </Form.Group>
+                        {errors.confirmPassword && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.confirmPassword}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -169,60 +416,101 @@ const DeliveryboySignup = () => {
                             <Form.Select
                               className={Styles.selectNumberByCountry}
                               aria-label="Default select example"
+                              name="code"
+                              value={formData.code}
+                              onChange={handleInputChange}
                             >
-                              <option value="1">+33</option>
-                              <option value="2">+91</option>
-                              <option value="3">+11</option>
+                              <option value="+33">+33</option>
+                              <option value="+91">+91</option>
                             </Form.Select>
                             <Form.Control
                               className={`password-field ${Styles.signupUserName}`}
                               type="text"
                               placeholder="0 00 00 00 00"
+                              name="number"
+                              onChange={handleInputChange}
                             />
                           </div>
                         </Form.Group>
+                        {errors.number && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.number}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext">
-                          <Form.Select
-                            className={Styles.pickupSingupCountrySelect}
-                            aria-label="Default select example"
-                          >
-                            <option>Country</option>
-                            <option value="1">France</option>
-                            <option value="2">India</option>
-                            <option value="3">Nepal</option>
-                          </Form.Select>
+                          <Select
+                            value={formData.dropdownCountryValue}
+                            onChange={handleCountryChange}
+                            options={countryList}
+                            placeholder="Select a country"
+                            isSearchable
+                            className={
+                              !!errors.dropdownCountryValue ? "is-invalid" : ""
+                            }
+                          />
                         </Form.Group>
+                        {errors.dropdownCountryValue && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.dropdownCountryValue}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext7">
-                          <Form.Select
-                            className={Styles.pickupSingupCountrySelect}
-                            aria-label="Default select example"
-                          >
-                            <option>Ain</option>
-                            <option value="1">France</option>
-                            <option value="2">India</option>
-                            <option value="3">Nepal</option>
-                          </Form.Select>
+                          <Select
+                            value={formData.dropdownStateValue}
+                            name="state"
+                            options={stateList}
+                            placeholder="Ain"
+                            isSearchable={true}
+                            onChange={handleStateChange}
+                            className={
+                              !!errors.dropdownStateValue ? "is-invalid" : ""
+                            }
+                          />
                         </Form.Group>
+                        {errors.dropdownStateValue && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.dropdownStateValue}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext8">
-                          <Form.Select
-                            className={Styles.pickupSingupCountrySelect}
-                            aria-label="Default select example"
-                          >
-                            <option>ambérieu-e...</option>
-                            <option value="1">France</option>
-                            <option value="2">India</option>
-                            <option value="3">Nepal</option>
-                          </Form.Select>
+                          <Select
+                            value={formData.dropdownCityValue}
+                            name="city"
+                            options={cityList}
+                            placeholder="ambérieu-e..."
+                            isSearchable={true}
+                            onChange={handleCityChange}
+                            className={
+                              !!errors.dropdownCityValue ? "is-invalid" : ""
+                            }
+                          />
                         </Form.Group>
+                        {errors.dropdownCityValue && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.dropdownCityValue}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-12">
@@ -236,9 +524,20 @@ const DeliveryboySignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Siret"
+                              name="siret"
+                              value={formData.siret}
+                              onChange={handleInputChange}
                             />
                           </div>
                         </Form.Group>
+                        {errors.siret && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.siret}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-12">
@@ -252,6 +551,10 @@ const DeliveryboySignup = () => {
                               id={`default-${type}`}
                               label={null}
                               className={Styles.DeliveryboySignupCustomcheckbox}
+                              name="termone"
+                              value={formData.termone}
+                              onChange={handleInputChange}
+                              isInvalid={!!errors.termone}
                             />
                             <p className={Styles.checkText}>
                               We collect this data for the purposes of
@@ -267,17 +570,32 @@ const DeliveryboySignup = () => {
                             </p>
                           </div>
                         ))}
+                        {errors.termone && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.termone}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </Form>
 
                   <div>
+                    {failedError && (
+                      <div className={Styles.checkText}>
+                        <p className={Styles.termsCheck}>{ermessage}</p>
+                      </div>
+                    )}
                     <Link
-                      to="/deliveryboy-add-vehicle"
+                      to="#"
                       className={Styles.pickupSignupContinueBtn}
                       type="button"
+                      onClick={submitHandler}
+                      disabled={hitButton}
                     >
-                      Continue
+                      {hitButton ? "Loading ..." : "Continue"}
                     </Link>
                     <p className={Styles.pickupSignupAcLoginText}>
                       Already have an account?{" "}

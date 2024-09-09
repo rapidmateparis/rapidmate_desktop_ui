@@ -67,3 +67,8 @@
 .pickupNotification-modalMain .modal-dialog-centered {
   min-height: auto !important;
 }
+
+.fa-check {
+  color: #fff;
+  font-size: 13px;
+}

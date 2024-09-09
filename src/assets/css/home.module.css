@@ -3191,7 +3191,7 @@ a {
   margin-top: 5px;
 }
 
-.deliveryboyAddVehicle-vehicleCard.selected {
+.deliveryboyAddVehicleVehicleCard.selected {
   background-color: #ff00581f;
   border: 1px solid var(--secondary-color);
 }

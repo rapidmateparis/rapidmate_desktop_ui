@@ -6,9 +6,15 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const ThankPage = ({baseUrl}) => {
+  const role=useSelector((state)=>state.auth.role)
+    
     let baseU='/'
     if(baseUrl){
-        baseU='/'+baseUrl+'/dashboard'
+        if(role==='DELIVERY_BOY'){
+          baseU='/'+baseUrl+'/dashboard'
+        }else{
+          baseU='/'+baseUrl+'/dashboard'
+        }
     }
     
   return (

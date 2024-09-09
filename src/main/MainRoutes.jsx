@@ -12,7 +12,9 @@ import {
     EnterprisesNewSchedule,
     AddPickupDetails,
     OrderView,
-    PaymentView
+    PaymentView,
+    AddVehicle,
+    AddWorkType
 } from "../common/pages"
 import {Route, BrowserRouter as Router, Routes} from 'react-router-dom'
 import ProtectedRoute from '../utils/ProtectedRoute'; 
@@ -42,7 +44,9 @@ function MainRoutes() {
           <Route path={`/${baseUrl}/pickup-details`} element={<ProtectedRoute requiredRole={userRole}><AddPickupDetails/></ProtectedRoute>} />
           <Route path={`/${baseUrl}/order-preview`} element={<ProtectedRoute requiredRole={userRole}><OrderView/></ProtectedRoute>} />
           <Route path={`/${baseUrl}/payment`} element={<ProtectedRoute requiredRole={userRole}><PaymentView/></ProtectedRoute>} />
-
+          {/*deliveryboy*/}
+          <Route path={`/${baseUrl}/add-vehicle`} element={<ProtectedRoute requiredRole={userRole}><AddVehicle/></ProtectedRoute>} />
+          <Route path={`/${baseUrl}/add-work-type`} element={<ProtectedRoute requiredRole={userRole}><AddWorkType/></ProtectedRoute>} />
             {/* <Route path="*" element={<Navigate to="/" />} /> */}
         </Routes>
     </Router>

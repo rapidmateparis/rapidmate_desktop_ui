@@ -26,6 +26,8 @@ import EnterprisesNewSchedule from "../components/enterprise/EnterprisesNewSched
 import AddPickupDetails from "../components/consumer/AddPickupDetails"
 import OrderView from "../components/consumer/OrderView"
 import PaymentView from "./PaymentView"
+import AddVehicle from "../components/deliveryboy/AddVehicle"
+import AddWorkType from "../components/deliveryboy/AddWorkType"
 
 export {
     Home,
@@ -55,5 +57,7 @@ export {
     EnterprisesNewSchedule,
     AddPickupDetails,
     OrderView,
-    PaymentView
+    PaymentView,
+    AddVehicle,
+    AddWorkType
 }

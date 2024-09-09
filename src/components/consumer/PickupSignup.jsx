@@ -17,7 +17,7 @@ import { getCountryList, signUpUser } from "../../data_manager/dataManage";
 import { useTranslation } from "react-i18next";
 
 const PickupSignup = () => {
-  const {t}=useTranslation()
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
@@ -32,7 +32,7 @@ const PickupSignup = () => {
   const [dropdownValue, setDropdownValue] = useState("+33");
   const [errors, setErrors] = useState({});
   const [ermessage, setErmessage] = useState("");
-  const [hitButton,setHitButton] =useState(false)
+  const [hitButton, setHitButton] = useState(false);
   const [failedError, setFailedError] = useState(false);
   const [masterCountryList, setMasterCountryList] = useState(null);
   const [countryList, setCountryList] = useState([]);
@@ -130,31 +130,31 @@ const PickupSignup = () => {
       // dispatch(loginFailed());
       return;
     }
-    setHitButton(true)
+    setHitButton(true);
     let params = {
       info: {
-        "userName": email,
-        "email": email,
-        "phoneNumber": code + number,
-        "password": password,
-        "userrole": "CONSUMER",
-        "firstName": name,
-        "lastName": "",
-        "country": dropdownCountryValue.toString()
+        userName: email,
+        email: email,
+        phoneNumber: code + number,
+        password: password,
+        userrole: "CONSUMER",
+        firstName: name,
+        lastName: "",
+        country: dropdownCountryValue.toString(),
       },
     };
     signUpUser(
       params,
       (successResponse) => {
         if (successResponse[0]._success) {
-          console.log(successResponse[0])
+          console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               setErmessage(successResponse[0]._response.name);
               setFailedError(true);
-              setHitButton(false)
+              setHitButton(false);
             } else {
-              setHitButton(false)
+              setHitButton(false);
               navigate("/signup-verify", {
                 state: {
                   user: {
@@ -169,15 +169,15 @@ const PickupSignup = () => {
         }
       },
       (errorResponse) => {
-        let err=''
-        if(errorResponse.errors){
-          err=errorResponse.errors.msg[0].msg
-        }else{
-          err=errorResponse[0]._errors.message
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
         }
         setErmessage(err);
         setFailedError(true);
-        setHitButton(false)
+        setHitButton(false);
       }
     );
   };
@@ -215,16 +215,14 @@ const PickupSignup = () => {
                   <Form>
                     <div className="row">
                       <div className="col-md-6">
-                        <p
-                          className={`${Styles.chooseProfileSubheading} ${
-                            errors.password ? Styles.forgotPassword : ""
-                          } lh-1`}
-                        >
-                          {errors.name !== undefined && errors.name !== null
-                            ? errors.name
-                            : ""}
-                        </p>
-
+                        {errors.name && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.name}
+                          </p>
+                        )}
                         <Form.Group className="mb-3" controlId="formPlaintext1">
                           <div className={Styles.pickupSignupContainer}>
                             <FontAwesomeIcon
@@ -243,15 +241,14 @@ const PickupSignup = () => {
                       </div>
 
                       <div className="col-md-6">
-                        <p
-                          className={`${Styles.chooseProfileSubheading} ${
-                            errors.email ? Styles.forgotPassword : ""
-                          } lh-1`}
-                        >
-                          {errors.email !== undefined && errors.email !== null
-                            ? errors.email
-                            : ""}
-                        </p>
+                        {errors.email && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.email}
+                          </p>
+                        )}
                         <Form.Group className="mb-3" controlId="formPlaintext2">
                           <div className={Styles.pickupSignupContainer}>
                             <FontAwesomeIcon
@@ -263,23 +260,20 @@ const PickupSignup = () => {
                               type="text"
                               placeholder="Email"
                               onChange={(e) => setEmail(e.target.value)}
-                              isInvalid={!!errors.email}
                             />
                           </div>
                         </Form.Group>
                       </div>
 
                       <div className="col-md-6">
-                        <p
-                          className={`${Styles.chooseProfileSubheading} ${
-                            errors.password ? Styles.forgotPassword : ""
-                          } lh-1`}
-                        >
-                          {errors.password !== undefined &&
-                          errors.password !== null
-                            ? errors.password
-                            : ""}
-                        </p>
+                        {errors.password && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.password}
+                          </p>
+                        )}
                         <Form.Group className="mb-3" controlId="formPlaintext3">
                           <div className={Styles.pickupSignupContainer}>
                             <FontAwesomeIcon
@@ -302,16 +296,14 @@ const PickupSignup = () => {
                       </div>
 
                       <div className="col-md-6">
-                        <p
-                          className={`${Styles.chooseProfileSubheading} ${
-                            errors.confirmPassword ? Styles.forgotPassword : ""
-                          } lh-1`}
-                        >
-                          {errors.confirmPassword !== undefined &&
-                          errors.confirmPassword !== null
-                            ? errors.confirmPassword
-                            : ""}
-                        </p>
+                        {errors.confirmPassword && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.confirmPassword}
+                          </p>
+                        )}
                         <Form.Group className="mb-3" controlId="formPlaintext4">
                           <div className={Styles.pickupSignupContainer}>
                             <FontAwesomeIcon
@@ -354,10 +346,17 @@ const PickupSignup = () => {
                               type="text"
                               placeholder="0 00 00 00 00"
                               onChange={(e) => setNumber(e.target.value)}
-                              isInvalid={!!errors.number}
                             />
                           </div>
                         </Form.Group>
+                        {errors.number && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.number}
+                          </p>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -378,6 +377,14 @@ const PickupSignup = () => {
                             ))}
                           </Form.Select>
                         </Form.Group>
+                        {errors.country && (
+                          <p
+                            className="text-danger lh-1"
+                            style={{ fontSize: "0.820em" }}
+                          >
+                            {errors.country}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -474,14 +481,12 @@ const PickupSignup = () => {
                       onClick={signUpHandler}
                       disabled={hitButton}
                     >
-                      {hitButton ? "Loading ..." : t('continue')}
-                     
+                      {hitButton ? "Loading ..." : t("continue")}
                     </Link>
                     <p className={Styles.pickupSignupAcLoginText}>
-                     {t('already_have_an_account')}{" "}
+                      {t("already_have_an_account")}{" "}
                       <Link to="/login" className={Styles.loginTextSignup}>
-                      {t('login')}
-
+                        {t("login")}
                       </Link>
                     </p>
                     <p className={Styles.pickupSignupAcLoginText}>

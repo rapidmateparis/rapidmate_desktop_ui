@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -30,7 +30,7 @@ import Select from "react-select";
 import { useTranslation } from "react-i18next";
 const EnterpriseSignup = () => {
   const navigate = useNavigate();
-  const {t} =useTranslation()
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const checkboxTypes = ["checkbox"];
@@ -38,38 +38,37 @@ const EnterpriseSignup = () => {
   const [hitButton, setHitButton] = useState(false);
   const [failedError, setFailedError] = useState(false);
   const [masterCountryList, setMasterCountryList] = useState(null);
-  const [countryList, setCountryList] = useState([]);
+  
   const [masterStateList, setMasterStateList] = useState(null);
   const [masterCityList, setMasterCityList] = useState(null);
+  const [countryList, setCountryList] = useState([]);
   const [stateList, setStateList] = useState([]);
   const [cityList, setCityList] = useState([]);
   const [dropdownCountryValue, setDropdownCountryValue] = useState(null);
   const [dropdownStateValue, setDropdownStateValue] = useState(null);
   const [dropdownCityValue, setDropdownCityValue] = useState(null);
 
-  // input value 
-  const [name, setName] = useState('');
-  const [lastname, setLastname] = useState('');
-  const [email, setEmail] = useState('');
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [deliveries, setDeliveries] = useState('');
-  const [code, setCode] = useState('+33');
-  const [number, setNumber] = useState('');
-  const [siret, setSiret] = useState('');
-  const [comments, setComments] = useState('');
-  const [termone, setTermone] = useState('');
-  const [termtwo, setTermtwo] = useState('');
-  const [role, setRole] = useState('');
- const [dropdownIndustryValue,setDropdownIndustryValue]=useState('')
- const [country,setCountry]=useState('')
- const [city,setCity]=useState('')
- const [state,setState]=useState('')
- const [industry,setIndustry]=useState('')
- const [errors, setErrors] = useState({});
+  // input value
+  const [name, setName] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [deliveries, setDeliveries] = useState("");
+  const [code, setCode] = useState("+33");
+  const [number, setNumber] = useState("");
+  const [siret, setSiret] = useState("");
+  const [comments, setComments] = useState("");
+  const [termone, setTermone] = useState("");
+  const [termtwo, setTermtwo] = useState("");
+  const [role, setRole] = useState("");
+  const [dropdownIndustryValue, setDropdownIndustryValue] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [errors, setErrors] = useState({});
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -144,99 +143,104 @@ const EnterpriseSignup = () => {
         setErmessage(errorResponse[0]._errors.message);
       }
     );
-    const roleName=localforage.getItem('roleName');
-    setRole(roleName)
+    const roleName = localforage.getItem("roleName");
+    setRole(roleName);
   }, []);
 
   const handleCountryChange = (selectedCountry) => {
     setDropdownCountryValue(selectedCountry);
     setCountry(selectedCountry.value);
-    const filteredStates = masterStateList.filter(state => state.country_id === selectedCountry.value).map(state => ({ label: state.state_name, value: state.id }));
+    const filteredStates = masterStateList
+      .filter((state) => state.country_id === selectedCountry.value)
+      .map((state) => ({ label: state.state_name, value: state.id }));
     setStateList(filteredStates);
     setDropdownStateValue(null);
     setCityList([]);
   };
   const handleIndustryChange = (selectedIndustry) => {
     setDropdownIndustryValue(selectedIndustry);
-    setIndustry(selectedIndustry.value)
-
+    setIndustry(selectedIndustry.value);
   };
 
   const handleStateChange = (selectedState) => {
     setDropdownStateValue(selectedState);
     setState(selectedState.value);
-    const filteredCities = masterCityList.filter(city => city.state_id === selectedState.value).map(city => ({ label: city.city_name, value: city.id }));
+    const filteredCities = masterCityList
+      .filter((city) => city.state_id === selectedState.value)
+      .map((city) => ({ label: city.city_name, value: city.id }));
     setCityList(filteredCities);
     setDropdownCityValue(null);
   };
-  const handleCityChange = (selectedCity)=>{
-    setDropdownCityValue(selectedCity)
-    setCity(selectedCity.value)
-  }
-
+  const handleCityChange = (selectedCity) => {
+    setDropdownCityValue(selectedCity);
+    setCity(selectedCity.value);
+  };
 
   const validateForm = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phonePattern = /^\+?\d{9,15}$/;
     let errors = {};
     if (!name.trim()) {
-      errors.name = 'First name is required';
+      errors.name = "First name is required";
     }
     if (!email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!emailPattern.test(email)) {
-      errors.email = 'Email address is invalid';
+      errors.email = "Email address is invalid";
     }
     if (!password.trim()) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     } else if (password.length < 6) {
-      errors.password = 'Password must be at least 6 characters long';
+      errors.password = "Password must be at least 6 characters long";
     }
     if (!confirmPassword.trim()) {
-      errors.confirmPassword = 'Confirm password is required';
+      errors.confirmPassword = "Confirm password is required";
     } else if (confirmPassword.length < 6) {
       errors.confirmPassword =
-        'Confirm password must be at least 6 characters long';
+        "Confirm password must be at least 6 characters long";
     }
     if (password !== confirmPassword) {
-      errors.confirmPassword = 'Passwords does not match';
+      errors.confirmPassword = "Passwords does not match";
     }
     if (!number.trim()) {
-      errors.number = 'Number is required';
+      errors.number = "Number is required";
     } else if (isNaN(number)) {
-      errors.number = 'Number should be numeric';
+      errors.number = "Number should be numeric";
     }
     if (!companyName.trim()) {
-      errors.companyName = 'Company name is required';
+      errors.companyName = "Company name is required";
     }
     if (!deliveries.trim()) {
-      errors.deliveries = 'Deliveries per month is required';
+      errors.deliveries = "Deliveries per month is required";
     }
     if (!dropdownCountryValue) {
-      errors.dropdownCountryValue = 'Please select a country';
+      errors.dropdownCountryValue = "Please select a country";
     }
     if (!dropdownStateValue) {
-      errors.dropdownStateValue = 'Please select a state';
+      errors.dropdownStateValue = "Please select a state";
     }
     if (!dropdownCityValue) {
-      errors.dropdownCityValue = 'Please select a city';
+      errors.dropdownCityValue = "Please select a city";
+    }
+    if (!dropdownIndustryValue) {
+      errors.dropdownIndustryValue = "Please select a industry";
     }
     if (!comments) {
-      errors.comments = 'Please describe your projects';
+      errors.comments = "Please describe your projects";
     }
     if (!siret) {
-      errors.siret = 'Please enter siret';
+      errors.siret = "Please enter siret";
     }
     if (!termone) {
-      errors.termone = 'You must agree to the terms';
+      errors.termone = "You must agree to the terms";
     }
     if (!termtwo) {
-      errors.termtwo = 'You must agree to the terms';
+      errors.termtwo = "You must agree to the terms";
     }
     return errors;
   };
 
-  const submitHandler = (e)=>{
+  const submitHandler = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -255,30 +259,30 @@ const EnterpriseSignup = () => {
         firstName: name,
         lastName: lastname,
         companyName: companyName,
-        deliveryMonthHours: deliveries + ' hours',
+        deliveryMonthHours: deliveries + " hours",
         description: comments,
         industryId: industry,
         city: city,
         state: state,
         country: country,
         siretNo: siret,
-        termone:(termone===true)?1:0,
-        termtwo:(termtwo===true)?1:0
+        termone: termone === true ? 1 : 0,
+        termtwo: termtwo === true ? 1 : 0,
       },
     };
-    console.log(params)
+    console.log(params);
     signUpUser(
       params,
       (successResponse) => {
         if (successResponse[0]._success) {
-          console.log(successResponse[0])
+          console.log(successResponse[0]);
           if (successResponse[0]._response) {
             if (successResponse[0]._response.name == "NotAuthorizedException") {
               setErmessage(successResponse[0]._response.name);
               setFailedError(true);
-              setHitButton(false)
+              setHitButton(false);
             } else {
-              setHitButton(false)
+              setHitButton(false);
               navigate("/signup-verify", {
                 state: {
                   user: {
@@ -293,45 +297,33 @@ const EnterpriseSignup = () => {
         }
       },
       (errorResponse) => {
-        let err=''
-        if(errorResponse.errors){
-          err=errorResponse.errors.msg[0].msg
-        }else{
-          err=errorResponse[0]._errors.message
+        let err = "";
+        if (errorResponse.errors) {
+          err = errorResponse.errors.msg[0].msg;
+        } else {
+          err = errorResponse[0]._errors.message;
         }
         setErmessage(err);
         setFailedError(true);
-        setHitButton(false)
+        setHitButton(false);
       }
     );
-    // setEmail('')
-    // setCode('')
-    // setNumber('')
-    // setPassword('')
-    // setName('')
-    // setLastname('')
-    // setComments('')
-    // setCompanyName('')
-    // setCountry('')
-    // setCity('')
-    // setState('')
-    // setTermone('')
-    // setTermtwo('')
-    // setSiret('')
-    // setIndustry('')
-    // setDeliveries('')
-    
-  }
+  };
 
   const data = [
-    {label: '+33', value: '+33'},
-    {label: '+91', value: '+01'},
+    { label: "+33", value: "+33" },
+    { label: "+91", value: "+01" },
   ];
 
   const industryList = [
-    {label: 'Restaurants', value: 1},
-    {label: 'Hospitals', value: 2},
-    {label: 'Logistics', value: 3},
+    { label: "Restaurant and takeaway", value: 1 },
+    { label: "Grocery and speciality", value: 2 },
+    { label: "Gift delivery", value: 3 },
+    { label: "Health and beauty", value: 4 },
+    { label: "Tech and electronics", value: 5 },
+    { label: "Retail and shopping", value: 6 },
+    { label: "Professional services", value: 7 },
+    { label: "Other", value: 8 },
   ];
   return (
     <>
@@ -358,7 +350,7 @@ const EnterpriseSignup = () => {
                   </div>
                 </div>
                 <div>
-                  <Form >
+                  <Form>
                     <div className="row">
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext1">
@@ -371,11 +363,11 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="First Name"
-                              onChange={e=>setName(e.target.value)}
-                              isInvalid={!!errors.name}
+                              onChange={(e) => setName(e.target.value)}
                             />
                           </div>
                         </Form.Group>
+                        {errors.name && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.name}</p>}
                       </div>
 
                       <div className="col-md-6">
@@ -389,9 +381,8 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Last Name"
-                              onChange={e=>setLastname(e.target.value)}
+                              onChange={(e) => setLastname(e.target.value)}
                               isInvalid={!!errors.lastName}
-
                             />
                           </div>
                         </Form.Group>
@@ -408,12 +399,11 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Email"
-                              onChange={e=>setEmail(e.target.value)}
-                              isInvalid={!!errors.email}
-
+                              onChange={(e) => setEmail(e.target.value)}
                             />
                           </div>
                         </Form.Group>
+                        {errors.email && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.email}</p>}
                       </div>
 
                       <div className="col-md-6">
@@ -427,18 +417,17 @@ const EnterpriseSignup = () => {
                               className={`password-field ${Styles.signupUserName}`}
                               type={showPassword ? "text" : "password"}
                               placeholder="Password"
-                              onChange={e=>setPassword(e.target.value)}
-                             
-
+                              onChange={(e) => setPassword(e.target.value)}
                             />
                             <FontAwesomeIcon
                               icon={showPassword ? faEye : faEyeSlash}
                               onClick={togglePasswordVisibility}
                               className={Styles.signupPasswordEyeIcon}
-                              
                             />
                           </div>
                         </Form.Group>
+                        {errors.password && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.password}</p>}
+
                       </div>
 
                       <div className="col-md-6">
@@ -452,7 +441,9 @@ const EnterpriseSignup = () => {
                               className={`password-field ${Styles.signupUserName}`}
                               type={showConfirmPassword ? "text" : "password"}
                               placeholder="Confirm password"
-                              onChange={e=>setConfirmPassword(e.target.value)}
+                              onChange={(e) =>
+                                setConfirmPassword(e.target.value)
+                              }
                             />
                             <FontAwesomeIcon
                               icon={showConfirmPassword ? faEye : faEyeSlash}
@@ -461,6 +452,7 @@ const EnterpriseSignup = () => {
                             />
                           </div>
                         </Form.Group>
+                        {errors.confirmPassword && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.confirmPassword}</p>}
                       </div>
 
                       <div className="col-md-6">
@@ -480,23 +472,26 @@ const EnterpriseSignup = () => {
                               placeholder="0 00 00 00 00"
                               onChange={(e) => setNumber(e.target.value)}
                               isInvalid={!!errors.number}
-
                             />
                           </div>
                         </Form.Group>
+                        {errors.number && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.number}</p>}
+
                       </div>
 
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext6">
-                        <Select
+                          <Select
                             value={dropdownCountryValue}
                             onChange={handleCountryChange}
                             options={countryList}
                             placeholder="Select a country"
                             isSearchable
-                            isInvalid={!!errors.dropdownCountryValue}
-
+                            className={!!errors.dropdownCountryValue ? 'is-invalid' : ''}
                           />
+                          <Form.Control.Feedback type="invalid">
+                              {errors.dropdownCountryValue}
+                            </Form.Control.Feedback>
                         </Form.Group>
                       </div>
 
@@ -511,24 +506,27 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Company name"
-                              onChange={e=>setCompanyName(e.target.value)}
-                              isInvalid={!!errors.companyName}
+                              onChange={(e) => setCompanyName(e.target.value)}
                             />
                           </div>
                         </Form.Group>
+                        {errors.companyName && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.companyName}</p>}
+
                       </div>
 
                       <div className="col-md-6">
                         <Form.Group className="mb-3" controlId="formPlaintext8">
-                        <Select
+                          <Select
                             value={dropdownIndustryValue}
                             options={industryList}
                             placeholder="Industry"
                             isSearchable={true}
                             onChange={handleIndustryChange}
-                            isInvalid={!!errors.dropdownIndustryValue}
-
+                            className={!!errors.dropdownIndustryValue ? 'is-invalid' : ''}
                           />
+                          <Form.Control.Feedback type="invalid">
+                              {errors.dropdownIndustryValue}
+                            </Form.Control.Feedback>
                         </Form.Group>
                       </div>
 
@@ -543,12 +541,12 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Deliveries per month / Hours per month"
-                              onChange={e=>setDeliveries(e.target.value)}
-                              isInvalid={!!errors.deliveries}
-
+                              onChange={(e) => setDeliveries(e.target.value)}
                             />
                           </div>
                         </Form.Group>
+                        {errors.deliveries && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.deliveries}</p>}
+
                       </div>
 
                       <div className="col-md-6">
@@ -562,10 +560,14 @@ const EnterpriseSignup = () => {
                             placeholder="Ain"
                             isSearchable={true}
                             onChange={handleStateChange}
-                            isInvalid={!!errors.dropdownStateValue}
+                            className={!!errors.dropdownStateValue ? 'is-invalid' : ''}
 
                           />
+                          <Form.Control.Feedback type="invalid">
+                              {errors.dropdownStateValue}
+                            </Form.Control.Feedback>
                         </Form.Group>
+                        
                       </div>
 
                       <div className="col-md-6">
@@ -573,17 +575,19 @@ const EnterpriseSignup = () => {
                           className="mb-3"
                           controlId="formPlaintext11"
                         >
-                         
                           <Select
                             value={dropdownCityValue}
                             options={cityList}
                             placeholder="ambérieu-e..."
                             isSearchable={true}
                             onChange={handleCityChange}
-                            isInvalid={!!errors.dropdownCityValue}
-                            
+                            className={!!errors.dropdownCityValue ? 'is-invalid' : ''}
                           />
+                          <Form.Control.Feedback type="invalid">
+                              {errors.dropdownCityValue}
+                            </Form.Control.Feedback>
                         </Form.Group>
+
                       </div>
 
                       <div className="col-md-12">
@@ -600,12 +604,11 @@ const EnterpriseSignup = () => {
                               className={Styles.signupUserName}
                               type="text"
                               placeholder="Siret"
-                              onChange={e=>setSiret(e.target.value)}
-                              isInvalid={!!errors.siret}
-
+                              onChange={(e) => setSiret(e.target.value)}
                             />
                           </div>
                         </Form.Group>
+                        {errors.siret && <p className="text-danger lh-1" style={{fontSize:"0.820em"}}>{errors.siret}</p>}
                       </div>
 
                       <div className="col-md-12">
@@ -619,7 +622,7 @@ const EnterpriseSignup = () => {
                               placeholder="Describe your projects here"
                               as="textarea"
                               rows={2}
-                              onChange={e=>setComments(e.target.value)}
+                              onChange={(e) => setComments(e.target.value)}
                             />
                           </div>
                         </Form.Group>
@@ -636,7 +639,7 @@ const EnterpriseSignup = () => {
                               id={`default-${type}`}
                               label={null}
                               className={Styles.DeliveryboySignupCustomcheckbox}
-                              onChange={e=>setTermone(e.target.checked)}
+                              onChange={(e) => setTermone(e.target.checked)}
                               isInvalid={!!errors.termone}
                             />
                             <p
@@ -662,9 +665,8 @@ const EnterpriseSignup = () => {
                               id={`default1-${type}`}
                               label={null}
                               className={Styles.DeliveryboySignupCustomcheckbox}
-                              onChange={e=>setTermtwo(e.target.checked)}
+                              onChange={(e) => setTermtwo(e.target.checked)}
                               isInvalid={!!errors.termtwo}
-
                             />
                             <p
                               className={Styles.checkText}
@@ -679,7 +681,6 @@ const EnterpriseSignup = () => {
                           </div>
                         ))}
                       </div>
-                      
                     </div>
                     {failedError && (
                       <div className={Styles.checkText}>
@@ -694,16 +695,15 @@ const EnterpriseSignup = () => {
                       onClick={submitHandler}
                       disabled={hitButton}
                     >
-                    {hitButton ? "Loading ..." : t('continue')}
+                      {hitButton ? "Loading ..." : t("continue")}
                     </Link>
                   </Form>
 
                   <div>
-                   
                     <p className={Styles.pickupSignupAcLoginText}>
                       Already have an account?{" "}
                       <Link to="/login" className={Styles.loginTextSignup}>
-                        {t('login')}
+                        {t("login")}
                       </Link>
                     </p>
                     {/* <p className={Styles.pickupSignupAcLoginText}>
